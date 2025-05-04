@@ -1,0 +1,64 @@
+version: "3.8"
+name: mi-assistant
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: mi-anythingllm
+    depends_on:
+      - infinity-server
+    ports:
+      - "3001:3001"
+    cap_add:
+      - SYS_ADMIN
+    environment:
+      - STORAGE_DIR=/app/server/storage
+      - JWT_SECRET=make_this_a_large_list_of_random_numbers_and_letters_20+
+      - LLM_PROVIDER=groq
+      - GROQ_API_KEY=your_key_here
+      - GROQ_MODEL_PREF=deepseek-r1-distill-llama-70b
+      - EMBEDDING_ENGINE=ollama
+      - EMBEDDING_BASE_PATH=http://nomic-embed-text:7997
+      - EMBEDDING_MODEL_PREF=nomic-ai/nomic-embed-text-v1.5
+      - EMBEDDING_MODEL_MAX_CHUNK_LENGTH=8192
+      - VECTOR_DB=qdrant
+      - QDRANT_ENDPOINT=your_endpoint_here
+      - QDRANT_API_KEY=your_key_here
+      - WHISPER_PROVIDER=local
+      - TTS_PROVIDER=native
+      - PASSWORDMINCHAR=8
+    volumes:
+      - ./anythingllm_storage:/app/server/storage
+    networks:
+      - internal-network
+
+  infinity-server:
+    image: michaelf34/infinity:0.0.70
+    container_name: mi-infinity-server
+    ports:
+      - "7997:7997"
+    volumes:
+      - ./infinity_storage:/app/.cache
+    networks:
+      - internal-network
+    command:
+      - v2
+      - --model-id
+      - nomic-ai/nomic-embed-text-v1.5
+      - --revision
+      - main
+      - --dtype
+      - float16
+      - --batch-size
+      - "8"
+      - --engine
+      - torch
+      - --port
+      - "7997"
+      - --no-bettertransformer
+    gpus: all
+    runtime: nvidia
+
+networks:
+  internal-network:
+    driver: bridge
+    name: mi-assistant-network

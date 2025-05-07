@@ -69,4 +69,4 @@ node jwt-secret-gen.js
 ## reference resources
 
 - [Github: Anything-LLM](https://github.com/Mintplex-Labs/anything-llm/tree/master?tab=readme-ov-file)
-- [Github: Infinity](https://github.com/michaelfeil/infinity")
+- [Github: Infinity](https://github.com/michaelfeil/infinity)
